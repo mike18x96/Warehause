@@ -3,8 +3,6 @@ package com.inetum.warehouse.controller;
 import com.inetum.warehouse.model.Product;
 import com.inetum.warehouse.service.ProductService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,12 +47,5 @@ public class ProductController {
             throw new EntityNotFoundException(id.toString());
         }
     }
-
-    @ExceptionHandler(EntityNotFoundException.class)
-    @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    public String notFoundHandler(EntityNotFoundException e) {
-        return String.format("Not found element with id: %s", e.getMessage());
-    }
-
 
 }
