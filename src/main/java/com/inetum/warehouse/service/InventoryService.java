@@ -1,6 +1,6 @@
 package com.inetum.warehouse.service;
 
-import com.inetum.warehouse.dto.Inventory2InventoryDtoConverter;
+import com.inetum.warehouse.dto.InventoryDtoConverter;
 import com.inetum.warehouse.dto.InventoryDto;
 import com.inetum.warehouse.model.Inventory;
 import com.inetum.warehouse.repository.InventoryRepository;
@@ -21,7 +21,7 @@ public class InventoryService {
     public List<InventoryDto> findAll() {
 
         List<Inventory> listInventory = inventoryRepository.findAll();
-        Inventory2InventoryDtoConverter converter = new Inventory2InventoryDtoConverter();
+        InventoryDtoConverter converter = new InventoryDtoConverter();
 
         return listInventory.stream()
                 .map(inventory -> converter.convert(inventory))
@@ -29,35 +29,60 @@ public class InventoryService {
     }
 
     public String increaseAmount(Long code, Long count) {
-
-        if (!inventoryRepository.existsById(code)) {
-            Inventory inventory = Inventory.builder()
+        if (!inventoryRepository.findInventoryByProduct(productRepository.findById(code).get()).isPresent()) {
+            Inventory inventory = (Inventory.builder()
+                    .id(code)
                     .count(count)
-                    .code(productRepository.getById(code))
-                    .build();
+                    .product(productRepository.getById(code))
+                    .build());
+
             inventoryRepository.save(inventory).getId();
-            return appropriateReturn(code, count, count);
+            return appropriateReturnForIncrease(code, count, count);
 
         } else {
-            Long previousAmountProduct = inventoryRepository.findInventoryByCode(productRepository.findById(code).get()).get().getCount();
+            Long previousAmountProduct = inventoryRepository.findInventoryByProduct(productRepository.findById(code).get()).get().getCount();
             Long totalCount = previousAmountProduct + count;
 
             Inventory inventory = Inventory.builder()
                     .id(code)
                     .count(totalCount)
-                    .code(productRepository.getById(code))
+                    .product(productRepository.getById(code))
                     .build();
             inventoryRepository.save(inventory);
 
-            return appropriateReturn(code, count, totalCount);
+            return appropriateReturnForIncrease(code, count, totalCount);
         }
     }
 
-    private String appropriateReturn(Long code, Long count, Long totalCount) {
+    private String appropriateReturnForIncrease(Long code, Long count, Long totalCount) {
         if (count == 1) {
             return String.format("%s piece of product have been added with the code: %s \nin total: %s", count, code, totalCount);
         } else {
             return String.format("%s pieces of product have been added with the code: %s \nin total: %s", count, code, totalCount);
+        }
+    }
+
+    public String decreaseAmount(Long code, Long count) {
+
+        Long previousAmountProduct = inventoryRepository.findInventoryByProduct(productRepository.findById(code).get()).get().getCount();
+        Long totalCount = previousAmountProduct - count;
+
+        Inventory inventory = Inventory.builder()
+                .id(code)
+                .count(totalCount)
+                .product(productRepository.getById(code))
+                .build();
+        inventoryRepository.save(inventory);
+
+        return appropriateReturnForDecrease(code, count, totalCount);
+
+    }
+
+    private String appropriateReturnForDecrease(Long code, Long count, Long totalCount) {
+        if (count == 1) {
+            return String.format("%s piece of product have been reduced with the code: %s \nin total: %s", count, code, totalCount);
+        } else {
+            return String.format("%s pieces of product have been reduced with the code: %s \nin total: %s", count, code, totalCount);
         }
     }
 

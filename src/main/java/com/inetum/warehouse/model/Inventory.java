@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -11,10 +12,12 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Data
 @Builder
-public class Inventory {
+public class Inventory implements Serializable {
+
+    private static final long serialVersionUID = 376436963768417453L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
@@ -23,6 +26,6 @@ public class Inventory {
     @ManyToOne
     @JoinColumn(name = "product_id")
     @NotNull
-    private Product code;
+    private Product product;
 
 }
