@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class NotEnoughAmountException extends RuntimeException {
-    public NotEnoughAmountException(String msg) {
-        super(msg);
+    public NotEnoughAmountException() {
     }
 }

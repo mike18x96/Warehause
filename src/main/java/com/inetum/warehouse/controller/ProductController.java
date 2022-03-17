@@ -4,6 +4,8 @@ import com.inetum.warehouse.model.Product;
 import com.inetum.warehouse.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityNotFoundException;
@@ -33,7 +35,7 @@ public class ProductController {
         try {
             return productService.update(id, updatedProduct);
         } catch (EntityNotFoundException e) {
-            throw new EntityNotFoundException(id.toString());
+            throw new EntityNotFoundException(String.format("Not found product with code: %s", id.toString()));
         }
     }
 
@@ -43,8 +45,13 @@ public class ProductController {
         try {
             productService.delete(id);
         } catch (EntityNotFoundException e) {
-            throw new EntityNotFoundException(id.toString());
+            throw new EntityNotFoundException(String.format("Not found product with code: %s", id.toString()));
         }
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<String> handleValidException(MethodArgumentNotValidException e) {
+        return new ResponseEntity("Incomplete object!", HttpStatus.BAD_REQUEST);
     }
 
 }

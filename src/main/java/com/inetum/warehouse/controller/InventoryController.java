@@ -4,12 +4,12 @@ import com.inetum.warehouse.dto.InventoryDto;
 import com.inetum.warehouse.service.InventoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityNotFoundException;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import java.util.List;
 
 
@@ -23,17 +23,23 @@ public class InventoryController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public String increaseAmount(@RequestParam Long code, @Min(1) @Max(999) @RequestParam  Long count) {
+    public String addProductToInventory(@RequestParam Long code, @RequestParam  Long count) {
         if (inventoryService.checkIfItExistsCodeProduct(code)) {
-            return inventoryService.increaseAmount(code, count);
+            return inventoryService.addProductToInventory(code, count);
         } else {
-            throw new EntityNotFoundException(code.toString());
+            throw new EntityNotFoundException(String.format("Not found product with code: %s", code.toString()));
         }
     }
 
     @GetMapping
     public List<InventoryDto> getAll() {
         return inventoryService.findAll();
+    }
+
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<String> handleValidException(MethodArgumentNotValidException e) {
+        return new ResponseEntity("Incomplete object!", HttpStatus.BAD_REQUEST);
     }
 
 }

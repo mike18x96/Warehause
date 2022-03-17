@@ -17,7 +17,6 @@ public class Inventory implements Serializable {
     private static final long serialVersionUID = 376436963768417453L;
 
     @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
