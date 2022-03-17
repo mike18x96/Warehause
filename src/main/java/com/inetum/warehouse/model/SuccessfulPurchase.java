@@ -1,16 +1,17 @@
 package com.inetum.warehouse.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Map;
 
 @Getter
+@Setter
+@AllArgsConstructor
 public class SuccessfulPurchase extends AbstractPurchase {
 
+    private boolean success;
     private Map<String, Long> purchasedProducts;
 
-    public SuccessfulPurchase(boolean success, Map<String, Long> purchasedProducts) {
-        super(success);
-        this.purchasedProducts = purchasedProducts;
-    }
 }

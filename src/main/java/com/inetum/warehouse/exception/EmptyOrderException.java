@@ -1,6 +1,7 @@
 package com.inetum.warehouse.exception;
 
 public class EmptyOrderException extends RuntimeException {
-    public EmptyOrderException() {
+    public EmptyOrderException(String msg) {
+        super(msg);
     }
 }

@@ -16,7 +16,6 @@ import javax.validation.constraints.NotNull;
 @Builder
 public class Inventory {
 
-
     @Id
     @NotNull
     private Long id;

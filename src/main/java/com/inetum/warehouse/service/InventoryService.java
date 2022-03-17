@@ -31,7 +31,6 @@ public class InventoryService {
     }
 
     public String increaseAmount(Inventory inventory) {
-
         validateProductToInventory(inventory);
 
         if (!inventoryRepository.findInventoryByProduct(productRepository.findById(inventory.getId()).get()).isPresent()) {
@@ -60,7 +59,6 @@ public class InventoryService {
     }
 
     public void decreaseAmount(Long code, Long count) {
-
         Long previousAmountProduct = inventoryRepository
                 .findInventoryByProduct(productRepository.findById(code).get()).get().getCount();
         Long totalCount = previousAmountProduct - count;
@@ -70,19 +68,16 @@ public class InventoryService {
                 .product(productRepository.getById(code))
                 .build();
         inventoryRepository.save(inventory);
-
     }
 
     private void validateProductToInventory(Inventory inventory) {
-
-        if(!isCodeProductInRepository(inventory.getId())){
+        if (!isCodeProductInRepository(inventory.getId())) {
             throw new EntityNotFoundException(String.format("Not found product with code: %s", inventory.getId()));
         }
 
         if (!isCountProductInRange(inventory.getCount())) {
             throw new WrongRangeException("Count must be between 1 and 999");
         }
-
     }
 
     private boolean isCodeProductInRepository(Long code) {
