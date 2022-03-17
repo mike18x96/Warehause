@@ -19,12 +19,12 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //@NotNull
-    //@NotBlank
+    @NotNull
+    @NotBlank
     private String name;
 
-    //@NotNull
-    //@NotBlank
+    @NotNull
+    @NotBlank
     private String description;
 
 }

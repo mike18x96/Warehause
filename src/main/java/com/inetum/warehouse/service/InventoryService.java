@@ -9,6 +9,7 @@ import com.inetum.warehouse.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,45 +30,40 @@ public class InventoryService {
                 .collect(Collectors.toList());
     }
 
-    public String addProductToInventory(Long code, Long count) {
-        if (!checkRangeCountProduct(count)) {
-            throw new WrongRangeException("Count must be between 1 and 999");
-        }
-        return increaseAmount(code, count);
+    public String increaseAmount(Inventory inventory) {
 
-    }
+        validateProductToInventory(inventory);
 
-    public String increaseAmount(Long code, Long count) {
-        if (!inventoryRepository.findInventoryByProduct(productRepository.findById(code).get()).isPresent()) {
-            Inventory inventory = (Inventory.builder()
-                    .id(code)
-                    .count(count)
-                    .product(productRepository.getById(code))
+        if (!inventoryRepository.findInventoryByProduct(productRepository.findById(inventory.getId()).get()).isPresent()) {
+            Inventory newInventory = (Inventory.builder()
+                    .id(inventory.getId())
+                    .count(inventory.getCount())
+                    .product(productRepository.getById(inventory.getId()))
                     .build());
 
-            inventoryRepository.save(inventory).getId();
-            return appropriateReturnForIncrease(code, count, count);
+            inventoryRepository.save(newInventory).getId();
+            return appropriateReturnForIncrease(inventory.getId(), inventory.getCount(), inventory.getCount());
 
         } else {
-            Long previousAmountProduct = inventoryRepository.findInventoryByProduct(productRepository.findById(code).get()).get().getCount();
-            Long totalCount = previousAmountProduct + count;
+            Long previousAmountProduct = inventoryRepository.findInventoryByProduct(productRepository.findById(inventory.getId()).get()).get().getCount();
+            Long totalCount = previousAmountProduct + inventory.getCount();
 
-            Inventory inventory = Inventory.builder()
-                    .id(code)
+            Inventory newInventory = Inventory.builder()
+                    .id(inventory.getId())
                     .count(totalCount)
-                    .product(productRepository.getById(code))
+                    .product(productRepository.getById(inventory.getId()))
                     .build();
-            inventoryRepository.save(inventory);
+            inventoryRepository.save(newInventory);
 
-            return appropriateReturnForIncrease(code, count, totalCount);
+            return appropriateReturnForIncrease(inventory.getId(), inventory.getCount(), totalCount);
         }
     }
 
     public void decreaseAmount(Long code, Long count) {
 
-        Long previousAmountProduct = inventoryRepository.findInventoryByProduct(productRepository.findById(code).get()).get().getCount();
+        Long previousAmountProduct = inventoryRepository
+                .findInventoryByProduct(productRepository.findById(code).get()).get().getCount();
         Long totalCount = previousAmountProduct - count;
-
         Inventory inventory = Inventory.builder()
                 .id(code)
                 .count(totalCount)
@@ -77,7 +73,19 @@ public class InventoryService {
 
     }
 
-    public boolean checkIfItExistsCodeProduct(Long code) {
+    private void validateProductToInventory(Inventory inventory) {
+
+        if(!isCodeProductInRepository(inventory.getId())){
+            throw new EntityNotFoundException(String.format("Not found product with code: %s", inventory.getId()));
+        }
+
+        if (!isCountProductInRange(inventory.getCount())) {
+            throw new WrongRangeException("Count must be between 1 and 999");
+        }
+
+    }
+
+    private boolean isCodeProductInRepository(Long code) {
         return productRepository.existsById(code);
     }
 
@@ -89,7 +97,7 @@ public class InventoryService {
         }
     }
 
-    private boolean checkRangeCountProduct(Long count) {
+    private boolean isCountProductInRange(Long count) {
         if (count > 0 && count < 1000) {
             return true;
         } else {

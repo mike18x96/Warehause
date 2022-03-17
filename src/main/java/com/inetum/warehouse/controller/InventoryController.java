@@ -1,6 +1,7 @@
 package com.inetum.warehouse.controller;
 
 import com.inetum.warehouse.dto.InventoryDto;
+import com.inetum.warehouse.model.Inventory;
 import com.inetum.warehouse.service.InventoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -9,13 +10,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 
 @RestController
 @RequiredArgsConstructor
-@Validated
 @RequestMapping("/inventory")
 public class InventoryController {
 
@@ -23,12 +22,8 @@ public class InventoryController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public String addProductToInventory(@RequestParam Long code, @RequestParam  Long count) {
-        if (inventoryService.checkIfItExistsCodeProduct(code)) {
-            return inventoryService.addProductToInventory(code, count);
-        } else {
-            throw new EntityNotFoundException(String.format("Not found product with code: %s", code.toString()));
-        }
+    public String addProductToInventory(@RequestBody Inventory inventory) {
+        return inventoryService.increaseAmount(inventory);
     }
 
     @GetMapping

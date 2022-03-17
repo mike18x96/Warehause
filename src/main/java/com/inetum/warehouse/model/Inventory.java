@@ -2,9 +2,11 @@ package com.inetum.warehouse.model;
 
 import lombok.*;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -12,11 +14,11 @@ import java.io.Serializable;
 @Entity
 @Data
 @Builder
-public class Inventory implements Serializable {
+public class Inventory {
 
-    private static final long serialVersionUID = 376436963768417453L;
 
     @Id
+    @NotNull
     private Long id;
 
     @NotNull
@@ -24,7 +26,6 @@ public class Inventory implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "product_id")
-    @NotNull
     private Product product;
 
 }

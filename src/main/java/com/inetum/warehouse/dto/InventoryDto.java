@@ -9,7 +9,7 @@ import lombok.Getter;
 @Getter
 public class InventoryDto {
 
-    private Long codeProduct;
+    private Long code;
     private Long count;
 
 }
