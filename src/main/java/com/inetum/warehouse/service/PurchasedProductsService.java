@@ -1,6 +1,6 @@
 package com.inetum.warehouse.service;
 
-import com.inetum.warehouse.exception.EmptyOrderException;
+import com.inetum.warehouse.exception.EmptyObjectException;
 import com.inetum.warehouse.model.AbstractPurchase;
 import com.inetum.warehouse.model.PurchaseProcessingResult;
 import com.inetum.warehouse.model.SuccessfulPurchase;
@@ -50,7 +50,7 @@ public class PurchasedProductsService {
         if (count > 0) {
             return true;
         } else {
-            throw new EmptyOrderException("The order can not be empty!");
+            throw new EmptyObjectException();
         }
     }
 

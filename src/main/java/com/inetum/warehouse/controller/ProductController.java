@@ -28,7 +28,7 @@ public class ProductController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Long create(@RequestBody @Valid Product product) {
-        return productService.save(product);
+        return productService.create(product);
     }
 
     @PutMapping("{id}")

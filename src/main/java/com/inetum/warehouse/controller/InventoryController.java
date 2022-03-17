@@ -1,6 +1,7 @@
 package com.inetum.warehouse.controller;
 
 import com.inetum.warehouse.dto.InventoryDto;
+import com.inetum.warehouse.exception.EmptyObjectException;
 import com.inetum.warehouse.model.Inventory;
 import com.inetum.warehouse.service.InventoryService;
 import lombok.RequiredArgsConstructor;
@@ -30,13 +31,13 @@ public class InventoryController {
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<String> handleValidException(HttpMessageNotReadableException e) {
+    public ResponseEntity<String> handleException(HttpMessageNotReadableException e) {
         return new ResponseEntity("Give the correct values!", HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(NumberFormatException.class)
-    public ResponseEntity<String> handleValidException(NumberFormatException e) {
-        return new ResponseEntity("Give the correct values!", HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(EmptyObjectException.class)
+    public ResponseEntity<String> handleException(EmptyObjectException e) {
+        return new ResponseEntity("The new Product in inventory can not be empty!", HttpStatus.BAD_REQUEST);
     }
 }
 

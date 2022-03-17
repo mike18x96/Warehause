@@ -1,6 +1,6 @@
 package com.inetum.warehouse.controller;
 
-import com.inetum.warehouse.exception.EmptyOrderException;
+import com.inetum.warehouse.exception.EmptyObjectException;
 import com.inetum.warehouse.model.AbstractPurchase;
 import com.inetum.warehouse.service.PurchasedProductsService;
 import lombok.RequiredArgsConstructor;
@@ -36,8 +36,9 @@ public class PurchasedProductsController {
     public ResponseEntity<String> handleValidException(NumberFormatException e) {
         return new ResponseEntity("Give the correct values!", HttpStatus.BAD_REQUEST);
     }
-    @ExceptionHandler(EmptyOrderException.class)
-    public ResponseEntity<String> handleException(EmptyOrderException e) {
+
+    @ExceptionHandler(EmptyObjectException.class)
+    public ResponseEntity<String> handleException(EmptyObjectException e) {
         return new ResponseEntity("Min one product in order!", HttpStatus.BAD_REQUEST);
     }
 

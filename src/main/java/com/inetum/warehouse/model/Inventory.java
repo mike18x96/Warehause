@@ -6,7 +6,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.validation.constraints.NotNull;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,10 +16,8 @@ import javax.validation.constraints.NotNull;
 public class Inventory {
 
     @Id
-    @NotNull
     private Long id;
 
-    @NotNull
     private Long count;
 
     @ManyToOne

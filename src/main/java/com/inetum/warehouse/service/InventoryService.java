@@ -1,7 +1,8 @@
 package com.inetum.warehouse.service;
 
-import com.inetum.warehouse.dto.InventoryDtoConverter;
 import com.inetum.warehouse.dto.InventoryDto;
+import com.inetum.warehouse.dto.InventoryDtoConverter;
+import com.inetum.warehouse.exception.EmptyObjectException;
 import com.inetum.warehouse.exception.WrongRangeException;
 import com.inetum.warehouse.model.Inventory;
 import com.inetum.warehouse.repository.InventoryRepository;
@@ -31,6 +32,7 @@ public class InventoryService {
     }
 
     public String increaseAmount(Inventory inventory) {
+        isNotEmptyInventory(inventory);
         validateProductToInventory(inventory);
 
         if (!inventoryRepository.findInventoryByProduct(productRepository.findById(inventory.getId()).get()).isPresent()) {
@@ -68,6 +70,12 @@ public class InventoryService {
                 .product(productRepository.getById(code))
                 .build();
         inventoryRepository.save(inventory);
+    }
+
+    private void isNotEmptyInventory(Inventory inventory) {
+        if ((inventory.getId() == null) || (inventory.getCount() == null)) {
+            throw new EmptyObjectException();
+        }
     }
 
     private void validateProductToInventory(Inventory inventory) {
