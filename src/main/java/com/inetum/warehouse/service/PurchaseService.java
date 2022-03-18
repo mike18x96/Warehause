@@ -13,7 +13,7 @@ import java.util.Map;
 
 @Service
 @AllArgsConstructor
-public class PurchasedProductsService {
+public class PurchaseService {
 
     private final InventoryRepository inventoryRepository;
     private final InventoryService inventoryService;

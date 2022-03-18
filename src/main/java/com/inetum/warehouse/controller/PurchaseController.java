@@ -2,7 +2,7 @@ package com.inetum.warehouse.controller;
 
 import com.inetum.warehouse.exception.EmptyObjectException;
 import com.inetum.warehouse.model.AbstractPurchase;
-import com.inetum.warehouse.service.PurchasedProductsService;
+import com.inetum.warehouse.service.PurchaseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,15 +16,15 @@ import java.util.Map;
 @RestController
 @RequestMapping("/purchase")
 @RequiredArgsConstructor
-public class PurchasedProductsController {
+public class PurchaseController {
 
-    private final PurchasedProductsService purchasedProductsService;
+    private final PurchaseService purchaseService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Validated
     public AbstractPurchase createOrder(@RequestBody @NotEmpty Map<String, Long> orderedProduct) {
-        return purchasedProductsService.validateOrder(orderedProduct);
+        return purchaseService.validateOrder(orderedProduct);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
