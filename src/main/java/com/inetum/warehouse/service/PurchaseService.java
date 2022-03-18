@@ -4,6 +4,7 @@ import com.inetum.warehouse.exception.EmptyObjectException;
 import com.inetum.warehouse.model.AbstractPurchase;
 import com.inetum.warehouse.model.PurchaseProcessingResult;
 import com.inetum.warehouse.model.SuccessfulPurchase;
+import com.inetum.warehouse.model.UnsuccessfulPurchase;
 import com.inetum.warehouse.repository.InventoryRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,7 +33,7 @@ public class PurchaseService {
             updateAmountInInventoryAfterPurchase(orderedProduct);
             return new SuccessfulPurchase(true, purchaseProcessingResult.getPurchasedProducts());
         } else {
-            return new SuccessfulPurchase(false, purchaseProcessingResult.getMissingProducts());
+            return new UnsuccessfulPurchase(false, purchaseProcessingResult.getMissingProducts());
         }
     }
 
