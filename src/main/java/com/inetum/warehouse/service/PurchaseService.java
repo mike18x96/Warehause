@@ -24,7 +24,7 @@ public class PurchaseService {
         PurchaseProcessingResult purchaseProcessingResult = new PurchaseProcessingResult();
 
         isNotEmpty(orderedProduct.size());
-        validateCorrectCode(orderedProduct);
+        checkCodeProductIfExistInRepo(orderedProduct);
         validateRangeOfCountOfProduct(orderedProduct);
 
         createPurchaseProcessingResult(orderedProduct, purchaseProcessingResult);
@@ -37,7 +37,7 @@ public class PurchaseService {
         }
     }
 
-    private void validateCorrectCode(Map<String, Long> orderedProduct) {
+    private void checkCodeProductIfExistInRepo(Map<String, Long> orderedProduct) {
         for (Map.Entry<String, Long> entry : orderedProduct.entrySet()) {
             String key = entry.getKey();
 
@@ -60,7 +60,7 @@ public class PurchaseService {
             Long value = entry.getValue();
 
             if (!(value > 0 && value < 1000)) {
-                throw new EntityNotFoundException("Order only in the range of 0-1000" + "\n");
+                throw new EntityNotFoundException("Order only in the range of 0-1000");
             }
         }
     }
