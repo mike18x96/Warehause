@@ -31,7 +31,7 @@ class InventoryServiceTest {
     private InventoryService inventoryService;
 
     @Test
-    void findAll_listOfInventoryExist_returnListInventory() {
+    void findAll_listOfInventoryIsExist_returnListInventory() {
         //given
         when(inventoryRepository.findAllByCountGreaterThan(1l)).thenReturn(new ArrayList<>());
         //when

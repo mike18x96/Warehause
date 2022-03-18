@@ -20,7 +20,6 @@ public class ProductService {
 
     public Long create(Product product) {
         return productRepository.save(product).getId();
-
     }
 
     public String update(Long id, Product newProduct) {
