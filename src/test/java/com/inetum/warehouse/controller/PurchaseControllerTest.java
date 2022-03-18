@@ -5,6 +5,9 @@ import com.inetum.warehouse.model.AbstractPurchase;
 import com.inetum.warehouse.service.PurchaseService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -14,8 +17,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -45,41 +48,25 @@ class PurchaseControllerTest {
                 .build();
     }
 
-    @Test
-    void create_giveIncorrectJson_returnsStatus400() throws Exception {
-        //given
-        List<String> listOfGivenJson = List.of(
-                "                    ",
-                "{\"1\": 50, \"2\":  a}",
-                "{\"1\": 50, \"2\":   }"
-        );
+    @ParameterizedTest
+    @MethodSource("provideIncorrectJson")
+    void create_giveIncorrectJson_returnsStatus400(String incorrectJson) throws Exception {
         //when
         String responseAsString1 = mockMvc.perform(post(URL)
                         .contentType(APPLICATION_JSON)
-                        .content(listOfGivenJson.get(0)))
+                        .content(incorrectJson))
                 .andExpect(status().isBadRequest())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
         assertThat(responseAsString1).contains("Give the correct values!");
+    }
 
-        String responseAsString2 = mockMvc.perform(post(URL)
-                        .contentType(APPLICATION_JSON)
-                        .content(listOfGivenJson.get(1)))
-                .andExpect(status().isBadRequest())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        assertThat(responseAsString2).contains("Give the correct values!");
-
-        String responseAsString3 = mockMvc.perform(post(URL)
-                        .contentType(APPLICATION_JSON)
-                        .content(listOfGivenJson.get(2)))
-                .andExpect(status().isBadRequest())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        assertThat(responseAsString3).contains("Give the correct values!");
+    private static Stream<Arguments> provideIncorrectJson() {
+        return Stream.of(
+                Arguments.of("                    "),
+                Arguments.of("{\"1\": 50, \"2\":  a}"),
+                Arguments.of("{\"1\": 50, \"2\":   }"));
     }
 
     @Test

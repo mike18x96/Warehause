@@ -5,6 +5,9 @@ import com.inetum.warehouse.service.ProductService;
 import com.inetum.warehouse.utils.TestJsonUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -14,7 +17,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.List;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -51,7 +54,6 @@ class ProductControllerTest {
     void create_correctProduct_returnsStatus201() throws Exception {
         //given
         String givenJson = "{\"name\": \"ABC\" ,\"description\": \"ABC\"}";
-
         //when
         mockMvc.perform(post(URL)
                         .contentType(APPLICATION_JSON)
@@ -59,99 +61,48 @@ class ProductControllerTest {
                 .andExpect(status().isCreated());
     }
 
-    @Test
-    void create_emptyProduct_returnsStatus400() throws Exception {
-        //given
-        List<String> listOfGivenJson = List.of(
-                "{}",
-                "{\"name\": \"ABC\" ,\"description\": \"\"   }",
-                "{\"name\": \"\"   ,\"description\": \"ABC\"}",
-                "{\"name\": \"\"    ,\"description\": \"\"   }"
-        );
-
+    @ParameterizedTest
+    @MethodSource("provideJsonOfEmptyValuesOfProduct")
+    void create_givenEmptyValuesOfProduct_returnsStatus400(String jsonOfEmptyValues) throws Exception {
         //when
         String responseAsString1 = mockMvc.perform(post(URL)
                         .contentType(APPLICATION_JSON)
-                        .content(listOfGivenJson.get(0)))
+                        .content(jsonOfEmptyValues))
                 .andExpect(status().isBadRequest())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
         assertThat(responseAsString1).contains("Values should not be empty!");
-
-        String responseAsString2 = mockMvc.perform(post(URL)
-                        .contentType(APPLICATION_JSON)
-                        .content(listOfGivenJson.get(1)))
-                .andExpect(status().isBadRequest())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        assertThat(responseAsString2).contains("Values should not be empty!");
-
-        String responseAsString3 = mockMvc.perform(post(URL)
-                        .contentType(APPLICATION_JSON)
-                        .content(listOfGivenJson.get(2)))
-                .andExpect(status().isBadRequest())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        assertThat(responseAsString3).contains("Values should not be empty!");
-
-        String responseAsString4 = mockMvc.perform(post(URL)
-                        .contentType(APPLICATION_JSON)
-                        .content(listOfGivenJson.get(3)))
-                .andExpect(status().isBadRequest())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        assertThat(responseAsString4).contains("Values should not be empty!");
     }
 
-    @Test
-    void create_giveIncorrectJson_returnsStatus400() throws Exception {
-        //given
-        List<String> listOfGivenJson = List.of(
-                "{\"name\": 1   ,\"description\":   }",
-                "{\"name\":     ,\"description\": 1 }",
-                "{\"name\":     ,\"description\":   }",
-                "{\"name\": 'a' ,\"description\":   }"
-        );
+    private static Stream<Arguments> provideJsonOfEmptyValuesOfProduct() {
+        return Stream.of(
+                Arguments.of("{}"),
+                Arguments.of("{\"name\": \"ABC\" ,\"description\": \"\"   }"),
+                Arguments.of("{\"name\": \"\"   ,\"description\": \"ABC\"}"),
+                Arguments.of("{\"name\": \"\"    ,\"description\": \"\"   }"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideIncorrectJson")
+    void create_giveIncorrectJson_returnsStatus400(String incorrectJson) throws Exception {
         //when
         String responseAsString1 = mockMvc.perform(post(URL)
                         .contentType(APPLICATION_JSON)
-                        .content(listOfGivenJson.get(0)))
+                        .content(incorrectJson))
                 .andExpect(status().isBadRequest())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
         assertThat(responseAsString1).contains("Give the correct values!");
+    }
 
-        String responseAsString2 = mockMvc.perform(post(URL)
-                        .contentType(APPLICATION_JSON)
-                        .content(listOfGivenJson.get(1)))
-                .andExpect(status().isBadRequest())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        assertThat(responseAsString2).contains("Give the correct values!");
-
-        String responseAsString3 = mockMvc.perform(post(URL)
-                        .contentType(APPLICATION_JSON)
-                        .content(listOfGivenJson.get(2)))
-                .andExpect(status().isBadRequest())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        assertThat(responseAsString3).contains("Give the correct values!");
-
-        String responseAsString4 = mockMvc.perform(post(URL)
-                        .contentType(APPLICATION_JSON)
-                        .content(listOfGivenJson.get(3)))
-                .andExpect(status().isBadRequest())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        assertThat(responseAsString4).contains("Give the correct values!");
+    private static Stream<Arguments> provideIncorrectJson() {
+        return Stream.of(
+                Arguments.of("{\"name\": 1   ,\"description\":   }"),
+                Arguments.of("{\"name\":     ,\"description\": 1 }"),
+                Arguments.of("{\"name\":     ,\"description\":   }"),
+                Arguments.of("{\"name\": 'a' ,\"description\":   }"));
     }
 
     @Test
@@ -177,10 +128,8 @@ class ProductControllerTest {
     @Test
     void delete_productWithGivenIdNotFound_returnsStatus400() throws Exception {
         //given
-
         doThrow(EntityNotFoundException.class)
                 .when(productService).delete(anyLong());
-
         //when
         mockMvc.perform(delete(URL + "/" + 1)
                         .contentType(APPLICATION_JSON)
@@ -204,6 +153,4 @@ class ProductControllerTest {
         verify(productService, times(1)).delete(anyLong());
         verifyNoMoreInteractions(productService);
     }
-
-
 }
