@@ -1,6 +1,5 @@
 package com.inetum.warehouse.service;
 
-import com.inetum.warehouse.exception.EmptyObjectException;
 import com.inetum.warehouse.model.Product;
 import com.inetum.warehouse.repository.ProductRepository;
 import lombok.AllArgsConstructor;
@@ -20,7 +19,6 @@ public class ProductService {
     }
 
     public Long create(Product product) {
-//        isNotEmpty(product);
         return productRepository.save(product).getId();
 
     }
@@ -40,12 +38,6 @@ public class ProductService {
             productRepository.deleteById(id);
         } else {
             throw new EntityNotFoundException();
-        }
-    }
-
-    private void isNotEmpty(Product product) {
-        if ((product.getName() == null) || (product.getDescription() == null)) {
-            throw new EmptyObjectException();
         }
     }
 }

@@ -46,7 +46,7 @@ class InventoryControllerTest {
     @Test
     void addProductToInventory_emptyInventory_returnsStatus400() throws Exception {
         //given
-        when(inventoryService.increaseAmount(any(Inventory.class))).thenThrow(EmptyObjectException.class);
+        when(inventoryService.addProductWithAmountToInventory(any(Inventory.class))).thenThrow(EmptyObjectException.class);
 
         String givenJson = "{}";
 

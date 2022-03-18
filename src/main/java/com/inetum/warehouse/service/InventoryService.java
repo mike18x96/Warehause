@@ -31,7 +31,7 @@ public class InventoryService {
                 .collect(Collectors.toList());
     }
 
-    public String increaseAmount(Inventory inventory) {
+    public String addProductWithAmountToInventory(Inventory inventory) {
         isNotEmptyInventory(inventory);
         validateProductToInventory(inventory);
 

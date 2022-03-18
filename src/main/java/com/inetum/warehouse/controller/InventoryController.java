@@ -22,7 +22,7 @@ public class InventoryController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public String addProductToInventory(@RequestBody Inventory inventory) {
-        return inventoryService.increaseAmount(inventory);
+        return inventoryService.addProductWithAmountToInventory(inventory);
     }
 
     @GetMapping

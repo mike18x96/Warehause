@@ -1,5 +1,6 @@
 package com.inetum.warehouse.controller;
 
+import com.inetum.warehouse.exception.EmptyObjectException;
 import com.inetum.warehouse.model.AbstractPurchase;
 import com.inetum.warehouse.service.PurchaseService;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,8 +51,7 @@ class PurchaseControllerTest {
         List<String> listOfGivenJson = List.of(
                 "                    ",
                 "{\"1\": 50, \"2\":  a}",
-                "{\"1\": 50, \"2\":   }",
-                "{\" \": 50, \"2\": 50}"
+                "{\"1\": 50, \"2\":   }"
         );
         //when
         String responseAsString1 = mockMvc.perform(post(URL)
@@ -80,20 +80,13 @@ class PurchaseControllerTest {
                 .getResponse()
                 .getContentAsString();
         assertThat(responseAsString3).contains("Give the correct values!");
-
-        String responseAsString4 = mockMvc.perform(post(URL)
-                        .contentType(APPLICATION_JSON)
-                        .content(listOfGivenJson.get(3)))
-                .andExpect(status().isBadRequest())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        assertThat(responseAsString4).contains("Give the correct values!");
     }
 
     @Test
     void create_giveEmptyMapInJson_returnsStatus400() throws Exception {
         //given
+        when(purchaseService.validateOrder(any())).thenThrow(EmptyObjectException.class);
+
         String givenJson = "{}";
         //when
         String responseAsString1 = mockMvc.perform(post(URL)
