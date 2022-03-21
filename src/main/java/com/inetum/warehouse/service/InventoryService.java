@@ -40,6 +40,7 @@ public class InventoryService {
                     .id(inventory.getId())
                     .count(inventory.getCount())
                     .product(productRepository.getById(inventory.getId()))
+                    .price(inventory.getPrice())
                     .build());
 
             inventoryRepository.save(newInventory).getId();
@@ -53,6 +54,7 @@ public class InventoryService {
                     .id(inventory.getId())
                     .count(totalCount)
                     .product(productRepository.getById(inventory.getId()))
+                    .price(inventory.getPrice())
                     .build();
             inventoryRepository.save(newInventory);
 
@@ -68,6 +70,7 @@ public class InventoryService {
                 .id(code)
                 .count(totalCount)
                 .product(productRepository.getById(code))
+                .price(inventoryRepository.getById(code).getPrice())
                 .build();
         inventoryRepository.save(inventory);
     }
@@ -94,9 +97,11 @@ public class InventoryService {
 
     private String appropriateReturnForIncrease(Long code, Long count, Long totalCount) {
         if (count == 1) {
-            return String.format("%s piece of product have been added with the code: %s \nin total: %s", count, code, totalCount);
+            return String.format("%s piece of product have been added with the code: %s" +
+                    "\nin total: %s", count, code, totalCount);
         } else {
-            return String.format("%s pieces of product have been added with the code: %s \nin total: %s", count, code, totalCount);
+            return String.format("%s pieces of product have been added with the code: %s" +
+                    "\nin total: %s", count, code, totalCount);
         }
     }
 

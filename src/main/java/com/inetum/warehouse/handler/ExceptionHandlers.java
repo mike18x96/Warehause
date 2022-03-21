@@ -1,4 +1,4 @@
-package com.inetum.warehouse.Handler;
+package com.inetum.warehouse.handler;
 
 import com.inetum.warehouse.exception.WrongRangeException;
 import org.springframework.http.HttpStatus;

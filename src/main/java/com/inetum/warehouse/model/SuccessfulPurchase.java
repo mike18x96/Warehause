@@ -14,6 +14,8 @@ import java.util.Map;
 public class SuccessfulPurchase extends AbstractPurchase {
 
     private boolean success;
+    private Long totalBill;
     private Map<String, Long> purchasedProducts;
+
 
 }

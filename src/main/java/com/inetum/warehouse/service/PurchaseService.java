@@ -31,7 +31,8 @@ public class PurchaseService {
 
         if (purchaseProcessingResult.getMissingProducts().isEmpty()) {
             updateAmountInInventoryAfterPurchase(orderedProduct);
-            return new SuccessfulPurchase(true, purchaseProcessingResult.getPurchasedProducts());
+            Long totalPrice = countTotalBill(orderedProduct);
+            return new SuccessfulPurchase(true, totalPrice, purchaseProcessingResult.getPurchasedProducts());
         } else {
             return new UnsuccessfulPurchase(false, purchaseProcessingResult.getMissingProducts());
         }
@@ -93,5 +94,16 @@ public class PurchaseService {
             Long value = entry.getValue();
             inventoryService.decreaseAmount(Long.valueOf(key), value);
         }
+    }
+
+    private Long countTotalBill(Map<String, Long> orderedProduct) {
+        Long purchaseBill = 0l;
+        for (Map.Entry<String, Long> entry : orderedProduct.entrySet()) {
+            String code = entry.getKey();
+            Long amount = entry.getValue();
+
+            purchaseBill += amount * inventoryRepository.findById(Long.valueOf(code)).get().getPrice();
+        }
+        return purchaseBill;
     }
 }

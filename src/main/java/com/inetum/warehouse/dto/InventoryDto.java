@@ -11,5 +11,6 @@ public class InventoryDto {
 
     private Long code;
     private Long count;
+    private Long price;
 
 }
