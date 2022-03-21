@@ -1,15 +1,13 @@
 package com.inetum.warehouse.service;
 
 import com.inetum.warehouse.exception.EmptyObjectException;
-import com.inetum.warehouse.model.AbstractPurchase;
-import com.inetum.warehouse.model.PurchaseProcessingResult;
-import com.inetum.warehouse.model.SuccessfulPurchase;
-import com.inetum.warehouse.model.UnsuccessfulPurchase;
+import com.inetum.warehouse.model.*;
 import com.inetum.warehouse.repository.InventoryRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import java.math.BigDecimal;
 import java.util.Map;
 
 @Service
@@ -22,6 +20,7 @@ public class PurchaseService {
     public AbstractPurchase validateOrder(Map<String, Long> orderedProduct) {
 
         PurchaseProcessingResult purchaseProcessingResult = new PurchaseProcessingResult();
+        Bill totalBill;
 
         isNotEmpty(orderedProduct.size());
         checkCodeProductIfExistInRepo(orderedProduct);
@@ -31,8 +30,8 @@ public class PurchaseService {
 
         if (purchaseProcessingResult.getMissingProducts().isEmpty()) {
             updateAmountInInventoryAfterPurchase(orderedProduct);
-            Long totalPrice = countTotalBill(orderedProduct);
-            return new SuccessfulPurchase(true, totalPrice, purchaseProcessingResult.getPurchasedProducts());
+            totalBill = createBill(orderedProduct);
+            return new SuccessfulPurchase(true, totalBill, purchaseProcessingResult.getPurchasedProducts());
         } else {
             return new UnsuccessfulPurchase(false, purchaseProcessingResult.getMissingProducts());
         }
@@ -96,14 +95,29 @@ public class PurchaseService {
         }
     }
 
-    private Long countTotalBill(Map<String, Long> orderedProduct) {
-        Long purchaseBill = 0l;
+    private Bill createBill(Map<String, Long> orderedProduct) {
+        BigDecimal purchaseBill = new BigDecimal(0L);
+
         for (Map.Entry<String, Long> entry : orderedProduct.entrySet()) {
             String code = entry.getKey();
             Long amount = entry.getValue();
 
-            purchaseBill += amount * inventoryRepository.findById(Long.valueOf(code)).get().getPrice();
+            purchaseBill = purchaseBill.add(BigDecimal
+                    .valueOf(amount * inventoryRepository.findById(Long.valueOf(code)).get().getPrice()));
         }
-        return purchaseBill;
+
+        if (purchaseBill.compareTo(BigDecimal.valueOf(200l)) <= 0) {
+            return Bill.builder()
+                    .totalBill(purchaseBill)
+                    .discountPercentage(BigDecimal.ZERO)
+                    .totalBillAfterDiscount(purchaseBill)
+                    .build();
+        } else {
+            return Bill.builder()
+                    .totalBill(purchaseBill)
+                    .discountPercentage(BigDecimal.valueOf(0.05))
+                    .totalBillAfterDiscount(purchaseBill.multiply(BigDecimal.valueOf(1 - 0.05)))
+                    .build();
+        }
     }
 }
